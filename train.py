@@ -66,5 +66,16 @@ def main():
         optimizer.load_state_dict(torch.load(OPTIMIZER_CHECKPOINT_PATH))
         print("Model loaded from checkpoint")
 
+    step_loss_log = []
+    step_acc_log = []
+    train_log = {
+        "train_loss": [],
+        "train_acc": [],
+        "val_acc": [],
+    }
+
     for epoch in range(N_EPOCHS):
-        
+        ...
+
+if __name__ == "__main__":
+    main()
