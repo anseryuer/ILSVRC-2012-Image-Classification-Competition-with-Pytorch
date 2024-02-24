@@ -1,0 +1,5 @@
+# Ignore all changes to the dataset folder
+dataset/*
+code/*
+# Except for the ILSVRC2012_devkit_t12 folder
+!dataset/ILSVRC2012_devkit_t12/
