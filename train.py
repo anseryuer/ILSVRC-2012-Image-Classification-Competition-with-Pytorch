@@ -16,6 +16,7 @@ PIN_MEMORY = True
 
 LEARNING_RATE = 0.001
 N_EPOCHS = 80
+TEST_PERIOD = 5
 
 # Set to True to train from a checkpoint, False to train from scratch.
 TRAIN_FROM_CHECKPOINT = False
