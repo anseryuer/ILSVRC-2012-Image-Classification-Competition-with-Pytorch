@@ -6,8 +6,10 @@ from torch.utils.data import DataLoader
 from torchsummary import summary
 
 from utils.transforms import naive_transforms, val_transforms, target_transform
-from utils.data_utils import get_train_dataset, get_val_dataset
+from utils.data_utils import get_train_dataset, get_val_dataset, get_test_dataset
 from models.models import Simple_Net, Small_Simple_Net, Res_Norm_Dropout_Net # Change this line to switch between models, or add more models to the import statement
+from utils.training import train_one_epoch, validate, write_log
+from utils.evaluation import evaluate, save_topk_indices
 
 TRAIN_BATCH_SIZE = 32
 VAL_BATCH_SIZE = 32
@@ -21,8 +23,13 @@ TEST_PERIOD = 5
 # Set to True to train from a checkpoint, False to train from scratch.
 TRAIN_FROM_CHECKPOINT = False
 # If training from a checkpoint, set the paths to the checkpoint files here.
-MODEL_CHECKPOINT_PATH = "output/checkpoint.pth"
-OPTIMIZER_CHECKPOINT_PATH = "output/optimizer.pth"
+MODEL_CHECKPOINT_PATH = "models/your_model_checkpoint.pt"
+OPTIMIZER_CHECKPOINT_PATH = "models/your_optimizer_checkpoint.pt"
+
+# Set the path to the output log file here.
+MODEL_CHECKPOINT_SAVE_DIR = "models/"
+OPTIMIZER_CHECKPOINT_SAVE_DIR = "models/"
+OUTPUT_LOG_DIR = "models/"
 
 # Set root directory
 root = r"/mnt/c/local_workplaces/ILSVRC 2012" # Change this line to the root directory of the project
@@ -43,8 +50,8 @@ def main():
     meta_df = pd.read_csv(f"{root}/meta.csv")
 
     # Load datasets
-    train_dataset = get_train_dataset(train_dir, naive_transforms(), target_transform)
-    val_dataset = get_val_dataset(val_dir, val_transforms(), labels)
+    train_dataset = get_train_dataset(train_dir, naive_transforms(), lambda x: target_transform(x, meta_df))
+    val_dataset = get_val_dataset(val_dir, val_transforms, labels)
 
     # Load dataloaders
     train_loader = DataLoader(train_dataset, batch_size=TRAIN_BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, pin_memory=PIN_MEMORY)
@@ -66,16 +73,52 @@ def main():
         optimizer.load_state_dict(torch.load(OPTIMIZER_CHECKPOINT_PATH))
         print("Model loaded from checkpoint")
 
-    step_loss_log = []
-    step_acc_log = []
+
     train_log = {
-        "train_loss": [],
-        "train_acc": [],
-        "val_acc": [],
+        "train": {
+            "epochs": [],
+            "loss": [], # the loss is the average of the cross-entropy loss
+            "acc": [], # the accuracy is the percentage of correct predictions
+        },
+        "validation": {
+            "epochs": [], 
+            "loss": [], # the loss is the average of the cross-entropy loss
+            "acc": [] # the accuracy is the percentage of correct predictions
+        }
     }
 
     for epoch in range(N_EPOCHS):
-        ...
+        train_loss, train_acc = train_one_epoch(train_loader, device, net, optimizer, criterion, epoch)
+        
+        train_log["train"]["epochs"].append(epoch)
+        train_log["train"]["loss"].append(train_loss)
+        train_log["train"]["acc"].append(train_acc)
+
+        if epoch % TEST_PERIOD == TEST_PERIOD - 1:
+            torch.save(net.state_dict(), MODEL_CHECKPOINT_PATH + f"model_{epoch}_{net._get_name()}.pt")
+            torch.save(optimizer.state_dict(), OPTIMIZER_CHECKPOINT_PATH + f"optimizer_{epoch}_{net._get_name()}.pt")
+
+            val_loss, val_acc = validate(val_loader, device, net, criterion)
+            train_log["validation"]["epochs"].append(epoch)
+            train_log["validation"]["loss"].append(val_loss)
+            train_log["validation"]["acc"].append(val_acc)
+
+        write_log(train_log, OUTPUT_LOG_DIR + f"log_{net._get_name()}.json")
+
+    print("Training complete")
+
+    # Make predictions on test set
+    test_dataset = get_test_dataset(test_dir, val_transforms())
+    test_loader = DataLoader(test_dataset, batch_size=VAL_BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS, pin_memory=PIN_MEMORY)
+
+    print(f"Test dataset loaded, with {len(test_dataset)} samples")
+
+    # Load best model
+    best_epoch = train_log["validation"]["epochs"][train_log["validation"]["acc"].index(max(train_log["validation"]["acc"]))]
+    print(f"Loading model from epoch {best_epoch} with the best validation accuracy")
+    net.load_state_dict(torch.load(MODEL_CHECKPOINT_PATH + f"model_{best_epoch}_{net._get_name()}.pt"))
+    topk_indices_list = evaluate(net, test_loader, device)
+    save_topk_indices(topk_indices_list, f"top5_indices_{net._get_name()}.txt")
 
 if __name__ == "__main__":
     main()
