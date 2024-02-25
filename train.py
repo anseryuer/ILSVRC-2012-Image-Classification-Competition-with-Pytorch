@@ -164,6 +164,8 @@ for epoch in range(N_EPOCHS):
     train_log["train"]["loss"].append(train_loss)
     train_log["train"]["acc"].append(train_acc)
     
+    torch.cuda.empty_cache()
+
     if epoch % TEST_PERIOD == TEST_PERIOD - 1:
         torch.save(net.state_dict(), MODEL_CHECKPOINT_PATH + f"model_{epoch}_{net._get_name()}.pt")
         torch.save(optimizer.state_dict(), OPTIMIZER_CHECKPOINT_PATH + f"optimizer_{epoch}_{net._get_name()}.pt")
@@ -172,6 +174,7 @@ for epoch in range(N_EPOCHS):
         train_log["validation"]["epochs"].append(epoch)
         train_log["validation"]["loss"].append(val_loss)
         train_log["validation"]["acc"].append(val_acc)
+        torch.cuda.empty_cache()
 
     write_log(train_log, OUTPUT_LOG_DIR + f"log_{net._get_name()}.json")
 
