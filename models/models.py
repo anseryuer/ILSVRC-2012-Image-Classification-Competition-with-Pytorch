@@ -35,13 +35,13 @@ class Simple_Net(nn.Module):
 class Small_Simple_Net(nn.Module):
     def __init__(self):
         super(Small_Simple_Net,self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, 7, padding="same")
-        self.conv2 = nn.Conv2d(64, 128, 3, padding="same")
-        self.conv3 = nn.Conv2d(128, 256, 3, padding="same")
-        self.conv4 = nn.Conv2d(256, 512, 3, padding="same")
-        self.pool = nn.MaxPool2d(6, 4, padding=2)
-        self.fc1 = nn.Linear(512, 512)
-        self.fc2 = nn.Linear(512, 1000)
+        self.conv1 = nn.Conv2d(3, 32, 3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, 3, padding=1)
+        self.conv3 = nn.Conv2d(64, 128, 3, padding=1)
+        self.conv4 = nn.Conv2d(128, 256, 3, padding=1)
+        self.pool = nn.MaxPool2d(4, 4)
+        self.fc1 = nn.Linear(256, 256)
+        self.fc2 = nn.Linear(256, 1000)
     def forward(self,x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))

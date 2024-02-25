@@ -1,7 +1,7 @@
 from torchvision.transforms import v2
 import torch
 import pandas as pd
-def fancy_transforms():
+def get_fancy_transforms():
     fancy_transforms = v2.Compose([
         v2.RandomResizedCrop(size=(256, 256), scale=(0.7, 1.0), ratio=(0.9, 1.1)),
         #v2.Resize(size=(256, 256)),
@@ -14,7 +14,7 @@ def fancy_transforms():
     ])
     return fancy_transforms
 
-def naive_transforms():
+def get_naive_transforms():
     naive_transforms = v2.Compose([
         v2.RandomResizedCrop(size=(256, 256), scale=(0.5, 1.0), ratio=(1.0, 1.0)),
         #v2.Resize(size=(256, 256)),
@@ -29,7 +29,7 @@ def naive_transforms():
 
     return naive_transforms
 
-def val_transforms():
+def get_val_transforms():
     val_transforms = v2.Compose([
         v2.Resize(size=(256)),
         v2.CenterCrop(size=(256, 256)),

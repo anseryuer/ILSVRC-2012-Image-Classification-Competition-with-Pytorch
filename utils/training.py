@@ -23,6 +23,8 @@ def train_one_epoch(train_loader : DataLoader, device, net, optimizer, criterion
         optimizer.step()
         running_loss += loss.item()
         running_acc += evaluate_acc(outputs, targets) * len(targets)
+        if batch_idx % 50 == 0:
+            print(f"Epoch {epoch}, Batch {batch_idx}: Loss: {loss.item():.4f}, Accuracy: {evaluate_acc(outputs, targets):.4f}")
     print(f"Epoch {epoch}: Average loss: {running_loss / len(train_loader.dataset):.4f}, Accuracy: {running_acc / len(train_loader.dataset):.4f}")
     return running_loss / len(train_loader.dataset), running_acc / len(train_loader.dataset)
 
