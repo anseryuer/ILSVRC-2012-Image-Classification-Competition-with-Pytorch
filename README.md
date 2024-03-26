@@ -4,7 +4,7 @@
 
 ## Description
 
- - Completing the classification task on the ILSVRC dataset with pytorch from ground up.
+ - Completing the classification task on the ILSVRC dataset with pytorch from ground up, reaching 30% top-1 class accuracy for the 1000 classification task.
  - Containing the dataset preprocess, loading, training, validation and testing part, offering customization ability in model structure, data transformation and other parts in the task. 
  - Implemented with PyTorch, can be used with GPU acceleration.
 
