@@ -19,6 +19,7 @@
   - [Table of Contents](#table-of-contents)
   - [Model score and prediction accuracy](#model-score-and-prediction-accuracy)
   - [Program Folder Structure](#program-folder-structure)
+  - [Network Structure](#network-structure)
   - [Usage](#usage)
   - [Contributing](#contributing)
   - [License](#license)
@@ -67,6 +68,9 @@ ILSVRC 2012 Image Classification Competition with Pytorch/
 │   └── evaluation.py  # Script for evaluating the trained model and output the final result.
 └── requirements.txt  # List of required Python libraries
 ```
+
+## Network Structure
+
 
 ## Usage
 
