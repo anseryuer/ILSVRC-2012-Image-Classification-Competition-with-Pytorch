@@ -71,6 +71,7 @@ ILSVRC 2012 Image Classification Competition with Pytorch/
 
 ## Network Structure
 
+![Neural Network Structure](image.png)
 
 ## Usage
 
